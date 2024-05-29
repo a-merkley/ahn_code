@@ -214,6 +214,6 @@ def bart(save_filename, num_runs):
 if __name__ == "__main__":
     save_filename = input("Please enter filename: ")  # Provide the filename you want to save the data to
     save_filename = save_filename + ".csv"
-    num_runs = 40
+    num_runs = 2
     bart(save_filename, num_runs)
 
