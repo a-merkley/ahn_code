@@ -10,7 +10,7 @@ from datetime import datetime
 
 
 # Read in raw data
-path_edf = "C:\\Users\\amand\\Documents\\Research\\Project_AHN\\Data_processing\\data\\p10\\p10.edf"
+path_edf = "C:\\Users\\amand\\Documents\\Research\\Project_AHN\\Data_processing\\data\\p11\\p11.edf"
 data = mne.io.read_raw_edf(path_edf, preload=True)
 channels = slib.create_channel_dict(data.ch_names)
 

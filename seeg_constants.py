@@ -23,14 +23,69 @@ delta = [1, 4]
 ##### Patient-specific parameters #####
 class Subject:
     def __init__(self, patient):
-        if patient == 'p10':  # quiet, anxious
+        if patient == 'p12':  # confused
+            self.NUM_STROOP = 5
+            self.NUM_BART = 5  # the first two BART have no triggers
+            self.E_MAP = {'stroop1': 0, 'stroop2': 1, 'stroop3': 2, 'stroop4': 3, 'stroop5': 4,
+                          'bart1': -1, 'bart2': -1, 'bart3': 5, 'bart4': 6, 'bart5': 7}  # FIXME: double check this for bart1, bart2
+            self.DATE = "05/20/24"
+
+            self.amydala_r = ["A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "A10"]
+            self.hippocampus_b_r = ["B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B9", "B10"]
+            self.amygdala_l = ["A'1", "A'2", "A'3", "A'4", "A'5", "A'6", "A'7", "A'8", "A'9", "A'10"]
+            self.hippocampus_b_l = ["B'1", "B'2", "B'3", "B'4", "B'5", "B'6", "B'7", "B'8", "B'9", "B'10"]
+            self.hippocampus_t_l = ["C'1", "C'2", "C'3", "C'4", "C'5", "C'6", "C'7", "C'8", "C'9", "C'10"]
+            self.entorhinal = ["E'1", "E'2", "E'3", "E'4", "E'5", "E'6", "E'7", "E'8"]
+            self.coll_sulcus = ["F'1", "F'2", "F'3", "F'4", "F'5", "F'6", "F'7", "F'8"]  # FIXME: check the names
+            self.ant_insula = ["U'1", "U'2", "U'3", "U'4", "U'5", "U'6"]
+            self.gyrus_rectus_l = ["O'1", "O'2", "O'3", "O'4", "O'5", "O'6", "O'7", "O'8", "O'9", "O'10", "O'11", "O'12"]
+
+        elif patient == 'p11':  # helpful farm
             self.NUM_STROOP = 6
-            self.NUM_BART = 5  # possibly 6
-            self.E_MAP = {}  # FIXME: FILL IN
+            self.NUM_BART = 5
+            self.E_MAP = {'stroop1': 0, 'stroop2': 1, 'stroop3': 2, 'stroop4': 3, 'stroop5': 4, 'stroop6': 5,
+                          'bart1': 6, 'bart2': 7, 'bart3': 8, 'bart4': 9, 'bart5': 10}
+            self.DATE = "03/22/24"
+
+            self.amydala_r = ["A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "A10"]
+            self.hippocampus_h_r = ["B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B9", "B10"]
+            self.hippocampus_t_r = ["C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "C10", "C11", "C12"]
+            self.entorhinal = ["E1", "E2", "E3", "E4", "E5", "E6", "E7", "E8", "E9", "E10"]
+            self.lingual = ["F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10"]
+            self.ant_insula = ["Y1", "Y2", "Y4", "Y5", "Y6", "Y7", "Y8", "Y9", "Y10", "Y11", "Y12", "Y13", "Y14", "Y15", "Y16"]
+            self.gyrus_rectus_r = ["O1", "O2", "O3", "O4", "O5", "O6", "O7", "O8", "O9", "O10", "O11", "O12"]
+            self.amcc = ["G-G'1", "G-G'2", "G-G'3", "G-G'4", "G-G'5", "G-G'6", "G-G'7", "G-G'8", "G-G'9", "G-G'10",
+                         "G-G'11", "G-G'12", "G-G'13", "G-G'14", "G-G'15", "G-G'16"]
+            self.pcc = ["X1", "X2", "X3", "X4", "X5", "X6", "X7", "X8", "X9", "X10", "X11", "X12", "X13", "X14"]
+            self.amygdala_l = ["A'1", "A'2", "A'3", "A'4", "A'5", "A'6", "A'7", "A'8"]
+            self.hippocampus_h_l = ["B'1", "B'2", "B'3", "B'4", "B'5", "B'6", "B'7", "B'8", "B'9", "B'10"]
+            self.hippocampus_t_l = ["C'1", "C'2", "C'3", "C'4", "C'5", "C'6", "C'7", "C'8", "C'9", "C'10"]
+            self.gyrus_rectus_l = ["O'1", "O'2", "O'3", "O'4", "O'5", "O'6", "O'7", "O'8", "O'9", "O'10", "O'11", "O'12"]
+
+        elif patient == 'p10':  # quiet, anxious
+            self.NUM_STROOP = 6
+            self.NUM_BART = 5  # possibly 6, FIXME figure this out
+            self.E_MAP = {'stroop1': 0, 'stroop2': 1, 'stroop3': 2, 'stroop4': 3, 'stroop5': 4, 'stroop6': 5,
+                          'bart1': 6, 'bart2': 7, 'bart3': 8, 'bart4': 9, 'bart5': 10}
             self.DATE = "03/22/24"
 
             self.amydala_l = ["A'1", "A'2", "A'3", "A'4", "A'5", "A'6", "A'7", "A'8", "A'9", "A'10", "A'11", "A'12"]
             self.hippocampus_h_l = ["B'1", "B'2", "B'3", "B'4", "B'5", "B'6", "B'7", "B'8", "B'9", "B'10"]
+            self.hippocampus_t_l = ["C'1", "C'2", "C'3", "C'4", "C'5", "C'6", "C'7", "C'8", "C'9", "C'10"]
+            self.gyrus_rectus_l = ["O'1", "O'2", "O'3", "O'4", "O'5", "O'6", "O'7", "O'8", "O'9", "O'10", "O'11",
+                                   "O'12"]
+            self.ant_insula = ["Y1", "Y2", "Y4", "Y5", "Y6", "Y7", "Y8", "Y9", "Y10", "Y11", "Y12", "Y13", "Y14", "Y15", "Y16"]
+            self.gyrus_rectus_r = ["O1", "O2", "O3", "O4", "O5", "O6", "O7", "O8", "O9", "O10", "O11",
+                                   "O12", "O13", "O14"]
+            self.amcc = ["G-G'1", "G-G'2", "G-G'3", "G-G'4", "G-G'5", "G-G'6", "G-G'7", "G-G'8", "G-G'9", "G-G'10",
+                         "G-G'11", "G-G'12", "G-G'13", "G-G'14"]
+            self.amydala = ["A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9"]
+            self.hippocampus_h_r = ["B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B9", "B10"]
+            self.hippocampus_t_r = ["C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "C10", "C11", "C12"]
+            self.lingual = ["F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10"]
+            self.fusiform = ["E1", "E2", "E3", "E4", "E5", "E6", "E7", "E8"]
+            self.heschl = ["U1", "U2", "U3", "U4", "U5", "U6", "U7", "U8"]
+
         elif patient == 'p9':  # games
             self.NUM_STROOP = 8
             self.NUM_BART = 5
