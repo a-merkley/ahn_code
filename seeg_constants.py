@@ -224,6 +224,7 @@ class Subject:
             self.pcc = ["X'1", "X'2", "X'3", "X'4", "X'5", "X'6", "X'7", "X'8", "X'9", "X'10", "X'11", "X'12", "X'13", "X'14"]  # Posterior cingulate
             self.ant_insula_r = ["Y 1", "Y 2", "Y 3", "Y 4", "Y 5", "Y 6", "Y 7", "Y 8", "Y 9", "Y 10", "Y 11", "Y 12", "Y 13", "Y 14", "Y 15"]
             self.ant_insula_l = ["Y'1", "Y'2", "Y'4", "Y'5", "Y'6", "Y'7", "Y'8", "Y'9", "Y'10", "Y'11", "Y'12", "Y'13", "Y'14", "Y'15"]
+
         elif patient == 'p3':
             self.NUM_STROOP = 15
             self.NUM_BART = 3
@@ -247,6 +248,7 @@ class Subject:
             self.ant_cc = ["X'1", "X'2", "X'3", "X'4", "X'5", "X'6", "X'7", "X'8", "X'9", "X'10", "X'11", "X'12"]
             self.ant_insula_l = ["Y'1", "Y'2", "Y'3", "Y'4", "Y'5", "Y'6", "Y'7", "Y'8", "Y'9", "Y'10", "Y'11", "Y'12", "Y'13", "Y'14"]
             self.ant_insula_r = ["Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7", "Y8", "Y9", "Y10", "Y11", "Y12", "Y13", "Y14"]
+
         elif patient == 'p2':
             self.NUM_STROOP = 8
             self.NUM_BART = 2
@@ -266,6 +268,7 @@ class Subject:
             self.heschl = ["U'1", "U'2", "U'3", "U'4", "U'5", "U'6"]
             self.mid_insula = ["X'1", "X'2", "X'3", "X'4", "X'5", "X'6", "X'7", "X'8", "X'9", "X'10", "X'11", "X'12"]
             self.insula = ["Y'1", "Y'2", "Y'3", "Y'4", "Y'5", "Y'6", "Y'7", "Y'8", "Y'9", "Y'10", "Y'11", "Y'12"]
+
         elif patient == 'p1':
             self.DATE = "06/17/23"
         else:

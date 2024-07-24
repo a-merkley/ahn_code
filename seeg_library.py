@@ -6,7 +6,6 @@ from scipy import signal
 from copy import *
 import seeg_constants as sconst
 import numpy.linalg as npl
-from sklearn.linear_model import ElasticNet
 
 
 # Read a CSV file differently, depending on whether it is a stroop or bart experiment
@@ -177,19 +176,6 @@ def band_noise_filter(sig, lower=0.5, upper=511, noise_freq=60, fs=1024):
     return no_stim_band_noiseless
 
 
-# Return the time as a datetime object
-# FIXME: FINISH
-def get_time_diff(time_pd):
-    time_lst = []
-    for t in time_pd:
-        time_raw = t.to_numpy()[-1]
-        time_split = time_raw.split()[-1]
-        fmt = '%H:%M:%S.%f'
-        time_lst.append(datetime.strptime(time_split, fmt))
-    blah = time_lst[1] - time_lst[0]
-    print("Hi")
-
-
 # Convert stroop colors into numeric values
 # c_arr: color array that is a pandas series (selected from column of pd dataframe)
 # Let 'red'=0, 'green'=1, 'blue'=2
@@ -233,13 +219,13 @@ def iterative_regression(A, M, dims=-1):
         for j in range(i):
             vj = np.expand_dims(v_ir[:, i-1], axis=1)
             A_clean -= vj @ vj.T @ A
-        # FIXME: MOVE THE GRAM SCHMIDT TO A FUNCTION!!!
         # Reduce the dimension of data matrix by one and compute new regression
         A_reduce = A_clean[:-i, :]
         vmax1 = npl.inv(A_reduce@A_reduce.T) @ A_reduce @ M
         # Boost the new vector up to n dimensions
         boost = np.zeros(i)
         vmax = np.expand_dims(np.append(vmax1, boost), axis=1)
+        # Gram-Schmidt
         for j in range(i):
             u = np.expand_dims(v_ir[:, j], axis=1)
             vmax -= np.dot(vmax.T, u) / np.dot(u.T, u) * u
@@ -247,46 +233,45 @@ def iterative_regression(A, M, dims=-1):
     return v_ir
 
 
-# FIXME: MERGE WITH ABOVE
-# A is a (features x samples) matrix
-# M is a (samples) vector
-# alpha and beta are weights on elastic net penalties
-# returns the set of regression vectors of size (features x features). Vectors indexed by columns
-def elastic_ir(A, M, dims=-1, alpha=0, beta=0):
-    num_feat = A.shape[0]
-    if dims > num_feat:
-        input("ERROR. CANNOT REQUEST MORE DIMENSIONS THAN # FEATURES IN A!\nPress enter.")
-    if dims == -1:
-        dims = num_feat
-    v_ir = np.zeros((num_feat, dims))
-
-    A = (A.T - np.mean(A, axis=1)).T
-    M = M - np.mean(M)
-
-    # Train initial model
-    enm = ElasticNet(alpha=alpha, l1_ratio=beta)  # define elastic net model
-    enm.fit(A.T, M)
-    vmax = enm.coef_
-    v_ir[:, 0] = vmax.T / npl.norm(vmax)
-
-    for i in np.arange(1, dims):
-        A_clean = A
-        for j in range(i):
-            vj = np.expand_dims(v_ir[:, i-1], axis=1)
-            A_clean -= vj @ vj.T @ A
-        # FIXME: MOVE THE GRAM SCHMIDT TO A FUNCTION!!!
-        # Reduce the dimension of data matrix by one and compute new regression
-        A_reduce = A_clean[:-i, :]
-        enm.fit(A_reduce.T, M)
-        vmax1 = enm.coef_
-        # Boost the new vector up to n dimensions
-        boost = np.zeros(i)
-        vmax = np.expand_dims(np.append(vmax1, boost), axis=1)
-        for j in range(i):
-            u = np.expand_dims(v_ir[:, j], axis=1)
-            vmax -= np.dot(vmax.T, u) / np.dot(u.T, u) * u
-        v_ir[:, i] = vmax.T / npl.norm(vmax)
-    return v_ir
+# # A is a (features x samples) matrix
+# # M is a (samples) vector
+# # alpha and beta are weights on elastic net penalties
+# # returns the set of regression vectors of size (features x features). Vectors indexed by columns
+# def elastic_ir(A, M, dims=-1, alpha=0, beta=0):
+#     num_feat = A.shape[0]
+#     if dims > num_feat:
+#         input("ERROR. CANNOT REQUEST MORE DIMENSIONS THAN # FEATURES IN A!\nPress enter.")
+#     if dims == -1:
+#         dims = num_feat
+#     v_ir = np.zeros((num_feat, dims))
+#
+#     A = (A.T - np.mean(A, axis=1)).T
+#     M = M - np.mean(M)
+#
+#     # Train initial model
+#     enm = ElasticNet(alpha=alpha, l1_ratio=beta)  # define elastic net model
+#     enm.fit(A.T, M)
+#     vmax = enm.coef_
+#     v_ir[:, 0] = vmax.T / npl.norm(vmax)
+#
+#     for i in np.arange(1, dims):
+#         A_clean = A
+#         for j in range(i):
+#             vj = np.expand_dims(v_ir[:, i-1], axis=1)
+#             A_clean -= vj @ vj.T @ A
+#         # FIXME: MOVE THE GRAM SCHMIDT TO A FUNCTION!!!
+#         # Reduce the dimension of data matrix by one and compute new regression
+#         A_reduce = A_clean[:-i, :]
+#         enm.fit(A_reduce.T, M)
+#         vmax1 = enm.coef_
+#         # Boost the new vector up to n dimensions
+#         boost = np.zeros(i)
+#         vmax = np.expand_dims(np.append(vmax1, boost), axis=1)
+#         for j in range(i):
+#             u = np.expand_dims(v_ir[:, j], axis=1)
+#             vmax -= np.dot(vmax.T, u) / np.dot(u.T, u) * u
+#         v_ir[:, i] = vmax.T / npl.norm(vmax)
+#     return v_ir
 
 
 # Calculate the time difference between many instances of two events, i.e. stroop stim to key time
