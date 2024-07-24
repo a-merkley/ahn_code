@@ -44,7 +44,7 @@ else:
     a = None
 
 
-#Trigger function
+# Trigger function
 def write_trigger(trig_type, a):
   switcher = {
       'start_experiment': (8, "uint8"),
@@ -59,7 +59,6 @@ def write_trigger(trig_type, a):
 
 
 trials = [["obs_setting", "decoy_setting", "decoy1_reward", "decoy2_reward", "obs_position", "choice", "gain", "total"]]
-lottery_picks = [["Observation"]]
 
 
 # Display instructions
@@ -80,11 +79,11 @@ event.waitKeys(keyList=['return'])
 ###########################################################################################################
 # Parameters: patient
 patient = "p13"
-num_trials = 10
 root_path = "C:\\Users\\amand\\Documents\\Research\\Project_AHN\\DD\\Data_processing\\data\\" + patient + "\\"
 save_name = patient + "_rutledge_behavior.csv"
 
 # Parameters: experiment
+num_trials = 10
 delay_choice = 1.0
 delay_outcome = 2.0
 total_money = 500
@@ -186,12 +185,13 @@ while num_trials > 0:
         core.wait(4.0)
     elif ('f' in keys and decoy_side == 1) or ('j' in keys and decoy_side == -1):
         # write_trigger('button_press', a)
-        lottery_picks.append([1])
+
         # Delay
         probabilities[i](win, prob_side)
         rlib.total_money_txt(win, total_money)
         win.flip()
         core.wait(delay_choice)
+
         # Outcome
         write_trigger('answer_showing', a)
         gain = probabilities_answer[i](win, prob_side)
@@ -202,12 +202,13 @@ while num_trials > 0:
         trials[-1].extend(["Observation", str(gain)])
     elif ('j' in keys and decoy_side == 1) or ('f' in keys and decoy_side == -1):
         # write_trigger('button_press', a)
-        lottery_picks.append([0])
+
         # Delay
         decoy_probabilities[x](win, dc1, dc2, decoy_side)
         rlib.total_money_txt(win, total_money)
         win.flip()
         core.wait(delay_choice)
+
         # Outcome
         write_trigger('answer_showing', a)
         gain = decoy_answer_probabilities[x](win, dc1, dc2, decoy_side)
