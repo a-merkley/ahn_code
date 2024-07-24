@@ -1,15 +1,12 @@
 from psychopy import visual
 import random
+import csv
 
 
-observation_reward = "+$5"
-observation_loss = "-$5"
-
-# decoy_options = ["+$0", "-$1", "-$2", "-$3", "-$4", "-$5", "-$10"]
-# decoy1_idx = random.randint(0, len(decoy_options)-1)
-# decoy2_idx = random.randint(0, len(decoy_options)-1)
-# decoy_1 = decoy_options[decoy1_idx]
-# decoy_2 = decoy_options[decoy2_idx]
+reward_amt = 5
+loss_amt = -5
+observation_reward = "+$" + str(reward_amt)
+observation_loss = "-$" + str(abs(loss_amt))
 
 
 def total_money_txt(win, total_money):
@@ -19,38 +16,38 @@ def total_money_txt(win, total_money):
     total.autoDraw = False
 
 
+def decoy_str2int(dc_str):
+    return -int(dc_str[2:])
+
+
+def save_data(fname, data_lst):
+    with open(fname, 'w', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerows(data_lst)
+
+
 def draw_0(win, side):
     wedge = visual.Circle(win, fillColor=[1, 1, -1], radius=0.25, pos=(side*0.25, 0.0))
     wedge.draw(win=None)
     wedge.autoDraw = False
-    # pos_reward_txt = (-0.25, 0.5)
     pos_loss_txt = (side*0.25, 0.0)
-    # reward_txt = visual.TextStim(win, text=observation_reward, pos=pos_reward_txt)
     loss_txt = visual.TextStim(win, text=observation_loss, pos=pos_loss_txt)
-    # trial_start = visual.TextStim(win, text = '+', color=(255, 255, 255), height = 0.5)
-    # trial_start.draw(win=None)
-    # trial_start.autoDraw = False
-    # reward_txt.draw(win=None)
-    # reward_txt.autoDraw = False
     loss_txt.draw(win=None)
     loss_txt.autoDraw = False
-    return -5
+    return loss_amt
 
 
 def draw_25(win, side):
-    wedge1 = visual.Pie(win, fillColor='pink', start=0, end=-90, radius=0.25, pos=(side*0.5, 0.0))
+    wedge1 = visual.Pie(win, fillColor='pink', start=0, end=-side*90, radius=0.25, pos=(side*0.5, 0.0))
     wedge1.draw(win=None)
     wedge1.autoDraw = False
-    wedge2 = visual.Pie(win, fillColor='blue', start=0, end=270, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
+    wedge2 = visual.Pie(win, fillColor='blue', start=0, end=side*270, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
     wedge2.draw(win=None)
     wedge2.autoDraw = False
-    pos_reward_txt = side*(0.6, 0.1)
-    pos_loss_txt = side*(0.4, -0.1)
+    pos_reward_txt = (side * 0.4, 0.1)
+    pos_loss_txt = (side * 0.6, -0.1)
     reward_txt = visual.TextStim(win, text=observation_reward, pos=pos_reward_txt)
     loss_txt = visual.TextStim(win, text=observation_loss, pos=pos_loss_txt)
-    # trial_start = visual.TextStim(win, text = '+', color=(255, 255, 255), height = 0.5)
-    # trial_start.draw(win=None)
-    # trial_start.autoDraw = False
     reward_txt.draw(win=None)
     reward_txt.autoDraw = False
     loss_txt.draw(win=None)
@@ -58,36 +55,33 @@ def draw_25(win, side):
 
 
 def answer_25(win, side):
-    wedge1 = visual.Pie(win, fillColor='pink', start=0, end=-90, radius=0.25, pos=(side*0.5, 0.0))
-    wedge1.draw(win=None)
-    wedge1.autoDraw = False
-    wedge2 = visual.Pie(win, fillColor='blue', start=0, end=270, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
-    wedge2.draw(win=None)
-    wedge2.autoDraw = False
-    pos_reward_txt = side*(0.6, 0.1)
-    pos_loss_txt = side*(0.4, -0.1)
-    reward_txt = visual.TextStim(win, text=observation_reward, pos=pos_reward_txt)
-    loss_txt = visual.TextStim(win, text=observation_loss, pos=pos_loss_txt)
-    # trial_start = visual.TextStim(win, text = '+', color=(255, 255, 255), height = 0.5)
-    # trial_start.draw(win=None)
-    # trial_start.autoDraw = False
-    reward_txt.draw(win=None)
-    reward_txt.autoDraw = False
-    loss_txt.draw(win=None)
-    loss_txt.autoDraw = False
-
     y = random.randint(0, 3)
 
     if y == 0:
-        wedge1 = visual.Pie(win, fillColor='orange', start=0, end=-90, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
+        # Draw wedge
+        wedge1 = visual.Pie(win, fillColor='pink', start=0, end=-side * 90, radius=0.25, pos=(side * 0.5, 0.0))
         wedge1.draw(win=None)
         wedge1.autoDraw = False
-        return 5
+
+        # Draw text
+        pos_reward_txt = (side * 0.4, 0.1)
+        reward_txt = visual.TextStim(win, text=observation_reward, pos=pos_reward_txt)
+        reward_txt.draw(win=None)
+        reward_txt.autoDraw = False
+        return reward_amt
     else:
-        wedge2 = visual.Pie(win, fillColor='orange', start=0, end=270, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
+        # Draw wedge
+        wedge2 = visual.Pie(win, fillColor='blue', start=0, end=side * 270, radius=0.25, pos=(side * 0.5, 0.0),
+                            opacity=0.25)
         wedge2.draw(win=None)
         wedge2.autoDraw = False
-        return -5
+
+        # Draw text
+        pos_loss_txt = (side * 0.6, -0.1)
+        loss_txt = visual.TextStim(win, text=observation_loss, pos=pos_loss_txt)
+        loss_txt.draw(win=None)
+        loss_txt.autoDraw = False
+        return loss_amt
 
 
 def draw_50(win, side):
@@ -101,9 +95,6 @@ def draw_50(win, side):
     pos_loss_txt = (side*0.4, 0.0)
     reward_txt = visual.TextStim(win, text=observation_reward, pos=pos_reward_txt)
     loss_txt = visual.TextStim(win, text=observation_loss, pos=pos_loss_txt)
-    # trial_start = visual.TextStim(win, text = '+', color=(255, 255, 255), height = 0.5)
-    # trial_start.draw(win=None)
-    # trial_start.autoDraw = False
     reward_txt.draw(win=None)
     reward_txt.autoDraw = False
     loss_txt.draw(win=None)
@@ -111,54 +102,46 @@ def draw_50(win, side):
 
 
 def answer_50(win, side):
-    wedge1 = visual.Pie(win, fillColor='pink', start=0, end=-side*180, radius=0.25, pos=(side*0.5, 0.0))
-    wedge1.draw(win=None)
-    wedge1.autoDraw = False
-    wedge2 = visual.Pie(win, fillColor='blue', start=0, end=side*180, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
-    wedge2.draw(win=None)
-    wedge2.autoDraw = False
-    pos_reward_txt = (side*0.6, 0.0)
-    pos_loss_txt = (side*0.4, 0.0)
-    reward_txt = visual.TextStim(win, text=observation_reward, pos=pos_reward_txt)
-    loss_txt = visual.TextStim(win, text=observation_loss, pos=pos_loss_txt)
-    # trial_start = visual.TextStim(win, text = '+', color=(255, 255, 255), height = 0.5)
-    # trial_start.draw(win=None)
-    # trial_start.autoDraw = False
-    reward_txt.draw(win=None)
-    reward_txt.autoDraw = False
-    loss_txt.draw(win=None)
-    loss_txt.autoDraw = False
-
     y = random.randint(0, 1)
 
     if y == 0:
-        wedge1 = visual.Pie(win, fillColor='orange', start=0, end=side*180, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
+        # Draw wedge
+        wedge1 = visual.Pie(win, fillColor='blue', start=0, end=side * 180, radius=0.25, pos=(side * 0.5, 0.0),
+                            opacity=0.25)
         wedge1.draw(win=None)
         wedge1.autoDraw = False
-        return 5
+
+        # Draw text
+        pos_reward_txt = (side * 0.6, 0.0)
+        reward_txt = visual.TextStim(win, text=observation_reward, pos=pos_reward_txt)
+        reward_txt.draw(win=None)
+        reward_txt.autoDraw = False
+        return reward_amt
     else:
-        wedge2 = visual.Pie(win, fillColor='orange', start=0, end=-side*180, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
+        # Draw wedge
+        wedge2 = visual.Pie(win, fillColor='pink', start=0, end=-side * 180, radius=0.25, pos=(side * 0.5, 0.0))
         wedge2.draw(win=None)
         wedge2.autoDraw = False
-        return -5
+
+        # Draw text
+        pos_loss_txt = (side * 0.4, 0.0)
+        loss_txt = visual.TextStim(win, text=observation_loss, pos=pos_loss_txt)
+        loss_txt.draw(win=None)
+        loss_txt.autoDraw = False
+        return loss_amt
 
 
 def draw_75(win, side):
-    if side == 1: txt_side = -1
-    else: txt_side = 1
-    wedge1 = visual.Pie(win, fillColor='pink', start=0, end=-270, radius=0.25, pos=(side*0.5, 0.0))
+    wedge1 = visual.Pie(win, fillColor='pink', start=0, end=-side*270, radius=0.25, pos=(side*0.5, 0.0))
     wedge1.draw(win=None)
     wedge1.autoDraw = False
-    wedge2 = visual.Pie(win, fillColor='blue', start=0, end=90, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
+    wedge2 = visual.Pie(win, fillColor='blue', start=0, end=side*90, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
     wedge2.draw(win=None)
     wedge2.autoDraw = False
-    pos_reward_txt = (0.6, -0.1)
-    pos_loss_txt = (0.4, 0.1)
+    pos_reward_txt = (side * 0.4, -0.1)
+    pos_loss_txt = (side * 0.6, 0.1)
     reward_txt = visual.TextStim(win, text=observation_reward, pos=pos_reward_txt)
     loss_txt = visual.TextStim(win, text=observation_loss, pos=pos_loss_txt)
-    # trial_start = visual.TextStim(win, text = '+', color=(255, 255, 255), height = 0.5)
-    # trial_start.draw(win=None)
-    # trial_start.autoDraw = False
     reward_txt.draw(win=None)
     reward_txt.autoDraw = False
     loss_txt.draw(win=None)
@@ -166,36 +149,33 @@ def draw_75(win, side):
 
 
 def answer_75(win, side):
-    wedge1 = visual.Pie(win, fillColor='pink', start=0, end=-270, radius=0.25, pos=(side*0.5, 0.0))
-    wedge1.draw(win=None)
-    wedge1.autoDraw = False
-    wedge2 = visual.Pie(win, fillColor='blue', start=0, end=90, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
-    wedge2.draw(win=None)
-    wedge2.autoDraw = False
-    pos_reward_txt = (side*0.6, -0.1)
-    pos_loss_txt = (side*0.4, 0.1)
-    reward_txt = visual.TextStim(win, text=observation_reward, pos=pos_reward_txt)
-    loss_txt = visual.TextStim(win, text=observation_loss, pos=pos_loss_txt)
-    # trial_start = visual.TextStim(win, text = '+', color=(255, 255, 255), height = 0.5)
-    # trial_start.draw(win=None)
-    # trial_start.autoDraw = False
-    reward_txt.draw(win=None)
-    reward_txt.autoDraw = False
-    loss_txt.draw(win=None)
-    loss_txt.autoDraw = False
-
     y = random.randint(0, 3)
 
     if y == 3:
-        wedge2 = visual.Pie(win, fillColor='orange', start=0, end=90, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
+        # Draw wedge
+        wedge2 = visual.Pie(win, fillColor='blue', start=0, end=side * 90, radius=0.25, pos=(side * 0.5, 0.0),
+                            opacity=0.25)
         wedge2.draw(win=None)
         wedge2.autoDraw = False
-        return -5
+
+        # Draw text
+        pos_loss_txt = (side * 0.6, 0.1)
+        loss_txt = visual.TextStim(win, text=observation_loss, pos=pos_loss_txt)
+        loss_txt.draw(win=None)
+        loss_txt.autoDraw = False
+        return loss_amt
     else:
-        wedge1 = visual.Pie(win, fillColor='orange', start=0, end=-270, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
+        # Draw wedge
+        wedge1 = visual.Pie(win, fillColor='pink', start=0, end=-side * 270, radius=0.25, pos=(side * 0.5, 0.0))
         wedge1.draw(win=None)
         wedge1.autoDraw = False
-        return 5
+
+        # Draw text
+        pos_reward_txt = (side * 0.4, -0.1)
+        reward_txt = visual.TextStim(win, text=observation_reward, pos=pos_reward_txt)
+        reward_txt.draw(win=None)
+        reward_txt.autoDraw = False
+        return reward_amt
 
 
 def draw_100(win, side):
@@ -203,17 +183,10 @@ def draw_100(win, side):
     wedge.draw(win=None)
     wedge.autoDraw = False
     pos_reward_txt = (side*0.25, 0.0)
-    # pos_loss_txt = (0.5, 0.0)
     reward_txt = visual.TextStim(win, text=observation_reward, pos=pos_reward_txt)
-    # loss_txt = visual.TextStim(win, text=observation_loss, pos=pos_loss_txt)
-    # trial_start = visual.TextStim(win, text = '+', color=(255, 255, 255), height = 0.5)
-    # trial_start.draw(win=None)
-    # trial_start.autoDraw = False
     reward_txt.draw(win=None)
     reward_txt.autoDraw = False
-    # loss_txt.draw(win=None)
-    # loss_txt.autoDraw = False
-    return 5
+    return reward_amt
 
 
 
@@ -223,54 +196,37 @@ def decoy_0(win, dc1, dc2, side):
     wedge = visual.Circle(win, fillColor='green', radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
     wedge.draw(win=None)
     wedge.autoDraw = False
-    # pos_reward_txt = (-0.25, 0.5)
     pos_loss_decoy = (side*0.5, 0.0)
-    # reward_txt = visual.TextStim(win, text=observation_reward, pos=pos_reward_txt)
     decoy_loss_txt = visual.TextStim(win, text=dc2, pos=pos_loss_decoy)
-    # trial_start = visual.TextStim(win, text = '+', color=(255, 255, 255), height = 0.5)
-    # trial_start.draw(win=None)
-    # trial_start.autoDraw = False
-    # reward_txt.draw(win=None)
-    # reward_txt.autoDraw = False
     decoy_loss_txt.draw(win=None)
     decoy_loss_txt.autoDraw = False
 
 
 def decoy_answer_0(win, dc1, dc2, side):
+    # Draw wedge
     wedge = visual.Circle(win, fillColor='green', radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
     wedge.draw(win=None)
     wedge.autoDraw = False
-    # pos_reward_txt = (-0.25, 0.5)
+
+    # Draw text
     pos_loss_decoy = (side*0.5, 0.0)
-    # reward_txt = visual.TextStim(win, text=observation_reward, pos=pos_reward_txt)
     decoy_loss_txt = visual.TextStim(win, text=dc2, pos=pos_loss_decoy)
-    # trial_start = visual.TextStim(win, text = '+', color=(255, 255, 255), height = 0.5)
-    # trial_start.draw(win=None)
-    # trial_start.autoDraw = False
-    # reward_txt.draw(win=None)
-    # reward_txt.autoDraw = False
     decoy_loss_txt.draw(win=None)
     decoy_loss_txt.autoDraw = False
-
-    wedge = visual.Circle(win, fillColor='orange', radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
-    wedge.draw(win=None)
-    wedge.autoDraw = False
+    return decoy_str2int(dc2)
 
 
 def decoy_25(win, dc1, dc2, side):
-    wedge1 = visual.Pie(win, fillColor='blue', start=0, end=-90, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
+    wedge1 = visual.Pie(win, fillColor='blue', start=0, end=-side*90, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
     wedge1.draw(win=None)
     wedge1.autoDraw = False
-    wedge2 = visual.Pie(win, fillColor='green', start=0, end=270, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
+    wedge2 = visual.Pie(win, fillColor='green', start=0, end=side*270, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
     wedge2.draw(win=None)
     wedge2.autoDraw = False
     pos_reward_decoy = (side*0.4, 0.1)
     pos_loss_decoy = (side*0.6, -0.1)
     decoy_reward_txt = visual.TextStim(win, text=dc1, pos=pos_reward_decoy)
     decoy_loss_txt = visual.TextStim(win, text=dc2, pos=pos_loss_decoy)
-    # trial_start = visual.TextStim(win, text = '+', color=(255, 255, 255), height = 0.5)
-    # trial_start.draw(win=None)
-    # trial_start.autoDraw = False
     decoy_reward_txt.draw(win=None)
     decoy_reward_txt.autoDraw = False
     decoy_loss_txt.draw(win=None)
@@ -278,50 +234,47 @@ def decoy_25(win, dc1, dc2, side):
 
 
 def decoy_answer_25(win, dc1, dc2, side):
-    wedge1 = visual.Pie(win, fillColor='blue', start=0, end=-90, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
-    wedge1.draw(win=None)
-    wedge1.autoDraw = False
-    wedge2 = visual.Pie(win, fillColor='green', start=0, end=270, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
-    wedge2.draw(win=None)
-    wedge2.autoDraw = False
-    pos_reward_decoy = (side*0.4, 0.1)
-    pos_loss_decoy = (side*0.6, -0.1)
-    decoy_reward_txt = visual.TextStim(win, text=dc1, pos=pos_reward_decoy)
-    decoy_loss_txt = visual.TextStim(win, text=dc2, pos=pos_loss_decoy)
-    # trial_start = visual.TextStim(win, text = '+', color=(255, 255, 255), height = 0.5)
-    # trial_start.draw(win=None)
-    # trial_start.autoDraw = False
-    decoy_reward_txt.draw(win=None)
-    decoy_reward_txt.autoDraw = False
-    decoy_loss_txt.draw(win=None)
-    decoy_loss_txt.autoDraw = False
-
     y = random.randint(0, 3)
 
     if y == 0:
-        wedge1 = visual.Pie(win, fillColor='orange', start=0, end=-90, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
+        # Draw wedge
+        wedge1 = visual.Pie(win, fillColor='blue', start=0, end=-side * 90, radius=0.25, pos=(side * 0.5, 0.0),
+                            opacity=0.25)
         wedge1.draw(win=None)
         wedge1.autoDraw = False
+
+        # Draw text
+        pos_reward_decoy = (side * 0.4, 0.1)
+        decoy_reward_txt = visual.TextStim(win, text=dc1, pos=pos_reward_decoy)
+        decoy_reward_txt.draw(win=None)
+        decoy_reward_txt.autoDraw = False
+        return decoy_str2int(dc1)
     else:
-        wedge2 = visual.Pie(win, fillColor='orange', start=0, end=270, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
+        # Draw wedge
+        wedge2 = visual.Pie(win, fillColor='green', start=0, end=side * 270, radius=0.25, pos=(side * 0.5, 0.0),
+                            opacity=0.25)
         wedge2.draw(win=None)
         wedge2.autoDraw = False
 
+        # Draw text
+        pos_loss_decoy = (side * 0.6, -0.1)
+        decoy_loss_txt = visual.TextStim(win, text=dc2, pos=pos_loss_decoy)
+        decoy_loss_txt.draw(win=None)
+        decoy_loss_txt.autoDraw = False
+        return decoy_str2int(dc2)
+
 
 def decoy_50(win, dc1, dc2, side):
-    wedge1 = visual.Pie(win, fillColor='blue', start=0, end=-180, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
+    wedge1 = visual.Pie(win, fillColor='blue', start=0, end=-side*180, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
     wedge1.draw(win=None)
     wedge1.autoDraw = False
-    wedge2 = visual.Pie(win, fillColor='green', start=0, end=180, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
+    wedge2 = visual.Pie(win, fillColor='green', start=0, end=side*180, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
     wedge2.draw(win=None)
     wedge2.autoDraw = False
     pos_reward_decoy = (side*0.4, 0.0)
     pos_loss_decoy = (side*0.6, 0.0)
     decoy_reward_txt = visual.TextStim(win, text=dc1, pos=pos_reward_decoy)
     decoy_loss_txt = visual.TextStim(win, text=dc2, pos=pos_loss_decoy)
-    # trial_start = visual.TextStim(win, text = '+', color=(255, 255, 255), height = 0.5)
-    # trial_start.draw(win=None)
-    # trial_start.autoDraw = False
     decoy_reward_txt.draw(win=None)
     decoy_reward_txt.autoDraw = False
     decoy_loss_txt.draw(win=None)
@@ -329,50 +282,47 @@ def decoy_50(win, dc1, dc2, side):
 
 
 def decoy_answer_50(win, dc1, dc2, side):
-    wedge1 = visual.Pie(win, fillColor='blue', start=0, end=-180, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
-    wedge1.draw(win=None)
-    wedge1.autoDraw = False
-    wedge2 = visual.Pie(win, fillColor='green', start=0, end=180, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
-    wedge2.draw(win=None)
-    wedge2.autoDraw = False
-    pos_reward_decoy = (side*0.4, 0.0)
-    pos_loss_decoy = (side*0.6, 0.0)
-    decoy_reward_txt = visual.TextStim(win, text=dc1, pos=pos_reward_decoy)
-    decoy_loss_txt = visual.TextStim(win, text=dc2, pos=pos_loss_decoy)
-    # trial_start = visual.TextStim(win, text = '+', color=(255, 255, 255), height = 0.5)
-    # trial_start.draw(win=None)
-    # trial_start.autoDraw = False
-    decoy_reward_txt.draw(win=None)
-    decoy_reward_txt.autoDraw = False
-    decoy_loss_txt.draw(win=None)
-    decoy_loss_txt.autoDraw = False
-
     y = random.randint(0, 1)
 
     if y == 0:
-        wedge1 = visual.Pie(win, fillColor='orange', start=0, end=-180, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
+        # Draw wedge
+        wedge1 = visual.Pie(win, fillColor='blue', start=0, end=-side * 180, radius=0.25, pos=(side * 0.5, 0.0),
+                            opacity=0.25)
         wedge1.draw(win=None)
         wedge1.autoDraw = False
+
+        # Draw text
+        pos_reward_decoy = (side * 0.4, 0.0)
+        decoy_reward_txt = visual.TextStim(win, text=dc1, pos=pos_reward_decoy)
+        decoy_reward_txt.draw(win=None)
+        decoy_reward_txt.autoDraw = False
+        return decoy_str2int(dc1)
     else:
-        wedge2 = visual.Pie(win, fillColor='orange', start=0, end=180, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
+        # Draw wedge
+        pos_loss_decoy = (side * 0.6, 0.0)
+        wedge2 = visual.Pie(win, fillColor='green', start=0, end=side * 180, radius=0.25, pos=(side * 0.5, 0.0),
+                            opacity=0.25)
         wedge2.draw(win=None)
         wedge2.autoDraw = False
 
+        # Draw text
+        decoy_loss_txt = visual.TextStim(win, text=dc2, pos=pos_loss_decoy)
+        decoy_loss_txt.draw(win=None)
+        decoy_loss_txt.autoDraw = False
+        return decoy_str2int(dc2)
+
 
 def decoy_75(win, dc1, dc2, side):
-    wedge1 = visual.Pie(win, fillColor='blue', start=0, end=-270, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
+    wedge1 = visual.Pie(win, fillColor='blue', start=0, end=-side*270, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
     wedge1.draw(win=None)
     wedge1.autoDraw = False
-    wedge2 = visual.Pie(win, fillColor='green', start=0, end=90, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
+    wedge2 = visual.Pie(win, fillColor='green', start=0, end=side*90, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
     wedge2.draw(win=None)
     wedge2.autoDraw = False
     pos_reward_decoy = (side*0.4, -0.1)
     pos_loss_decoy = (side*0.6, 0.1)
     decoy_reward_txt = visual.TextStim(win, text=dc1, pos=pos_reward_decoy)
     decoy_loss_txt = visual.TextStim(win, text=dc2, pos=pos_loss_decoy)
-    # trial_start = visual.TextStim(win, text = '+', color=(255, 255, 255), height = 0.5)
-    # trial_start.draw(win=None)
-    # trial_start.autoDraw = False
     decoy_reward_txt.draw(win=None)
     decoy_reward_txt.autoDraw = False
     decoy_loss_txt.draw(win=None)
@@ -380,34 +330,34 @@ def decoy_75(win, dc1, dc2, side):
 
 
 def decoy_answer_75(win, dc1, dc2, side):
-    wedge1 = visual.Pie(win, fillColor='blue', start=0, end=-270, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
-    wedge1.draw(win=None)
-    wedge1.autoDraw = False
-    wedge2 = visual.Pie(win, fillColor='green', start=0, end=90, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
-    wedge2.draw(win=None)
-    wedge2.autoDraw = False
-    pos_reward_decoy = (side*0.4, -0.1)
-    pos_loss_decoy = (side*0.6, 0.1)
-    decoy_reward_txt = visual.TextStim(win, text=dc1, pos=pos_reward_decoy)
-    decoy_loss_txt = visual.TextStim(win, text=dc2, pos=pos_loss_decoy)
-    # trial_start = visual.TextStim(win, text = '+', color=(255, 255, 255), height = 0.5)
-    # trial_start.draw(win=None)
-    # trial_start.autoDraw = False
-    decoy_reward_txt.draw(win=None)
-    decoy_reward_txt.autoDraw = False
-    decoy_loss_txt.draw(win=None)
-    decoy_loss_txt.autoDraw = False
-
     y = random.randint(0, 3)
 
     if y == 3:
-        wedge2 = visual.Pie(win, fillColor='orange', start=0, end=90, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
+        # Draw wedge
+        wedge2 = visual.Pie(win, fillColor='green', start=0, end=side * 90, radius=0.25, pos=(side * 0.5, 0.0),
+                            opacity=0.25)
         wedge2.draw(win=None)
         wedge2.autoDraw = False
+
+        # Draw text
+        pos_loss_decoy = (side * 0.6, 0.1)
+        decoy_loss_txt = visual.TextStim(win, text=dc2, pos=pos_loss_decoy)
+        decoy_loss_txt.draw(win=None)
+        decoy_loss_txt.autoDraw = False
+        return decoy_str2int(dc2)
     else:
-        wedge1 = visual.Pie(win, fillColor='orange', start=0, end=-270, radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
+        # Draw wedge
+        wedge1 = visual.Pie(win, fillColor='blue', start=0, end=-side * 270, radius=0.25, pos=(side * 0.5, 0.0),
+                            opacity=0.25)
         wedge1.draw(win=None)
         wedge1.autoDraw = False
+
+        # Draw text
+        pos_reward_decoy = (side * 0.4, -0.1)
+        decoy_reward_txt = visual.TextStim(win, text=dc1, pos=pos_reward_decoy)
+        decoy_reward_txt.draw(win=None)
+        decoy_reward_txt.autoDraw = False
+        return decoy_str2int(dc1)
 
 
 def decoy_100(win, dc1, dc2, side):
@@ -415,35 +365,21 @@ def decoy_100(win, dc1, dc2, side):
     wedge.draw(win=None)
     wedge.autoDraw = False
     pos_reward_decoy = (side*0.5, 0.0)
-    # pos_loss_decoy = (0.0, 0.0)
     decoy_reward_txt = visual.TextStim(win, text=dc1, pos=pos_reward_decoy)
-    # decoy_loss_txt = visual.TextStim(win, text=dc2, pos=pos_loss_decoy)
-    # trial_start = visual.TextStim(win, text = '+', color=(255, 255, 255), height = 0.5)
-    # trial_start.draw(win=None)
-    # trial_start.autoDraw = False
     decoy_reward_txt.draw(win=None)
     decoy_reward_txt.autoDraw = False
-    # decoy_loss_txt.draw(win=None)
-    # decoy_loss_txt.autoDraw = False
 
 
 def decoy_answer_100(win, dc1, dc2, side):
+    # Draw wedge
     wedge = visual.Circle(win, fillColor='blue', radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
     wedge.draw(win=None)
     wedge.autoDraw = False
+
+    # Draw text
     pos_reward_decoy = (side*0.5, 0.0)
-    # pos_loss_decoy = (0.0, 0.0)
     decoy_reward_txt = visual.TextStim(win, text=dc1, pos=pos_reward_decoy)
-    # decoy_loss_txt = visual.TextStim(win, text=dc2, pos=pos_loss_decoy)
-    # trial_start = visual.TextStim(win, text = '+', color=(255, 255, 255), height = 0.5)
-    # trial_start.draw(win=None)
-    # trial_start.autoDraw = False
     decoy_reward_txt.draw(win=None)
     decoy_reward_txt.autoDraw = False
-    # decoy_loss_txt.draw(win=None)
-    # decoy_loss_txt.autoDraw = False
-
-    wedge = visual.Circle(win, fillColor='orange', radius=0.25, pos=(side*0.5, 0.0), opacity=0.25)
-    wedge.draw(win=None)
-    wedge.autoDraw = False
+    return decoy_str2int(dc1)
 
