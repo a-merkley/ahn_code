@@ -15,8 +15,6 @@ void setup() {
   pinMode(natus_pin1, OUTPUT);
   pinMode(natus_pin2, OUTPUT);
   pinMode(natus_pin9_latch, OUTPUT);
-
-  digitalWrite(natus_pin9_latch, HIGH);
 }
 
 
@@ -32,10 +30,10 @@ void loop() {
   {
     // Pulse 1
     digitalWrite(natus_pin1, HIGH);
-    // digitalWrite(natus_pin2, HIGH);
+    digitalWrite(natus_pin2, HIGH);
     delay(width);
     digitalWrite(natus_pin1, LOW);
-    // digitalWrite(natus_pin2, LOW);
+    digitalWrite(natus_pin2, LOW);
   }
 
  // person makes a choice
@@ -43,10 +41,10 @@ void loop() {
   {
 // pulse 1
     digitalWrite(natus_pin1, HIGH);
-    // digitalWrite(natus_pin2, HIGH);
+    digitalWrite(natus_pin2, HIGH);
     delay(width);
     digitalWrite(natus_pin1, LOW);
-    // digitalWrite(natus_pin2, LOW);
+    digitalWrite(natus_pin2, LOW);
   }
   // End experiment
   else if (data == 7)

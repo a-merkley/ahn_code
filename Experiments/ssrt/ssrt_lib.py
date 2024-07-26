@@ -1,41 +1,5 @@
-from psychopy import core, data, event, sound, visual
-import numpy as np
+from psychopy import core, event, visual
 from psychopy.visual.circle import Circle
-import csv
-
-respClock = core.Clock()
-
-
-# Trigger function
-def write_trigger(trig_type, a):
-    switcher = {
-        'start_experiment': (8, "uint8"),
-        'stim_onset': (5, "uint8"),
-        'button_press': (6, "uint8"),
-        'successful_stop': (7, "uint8")
-    }
-    pin, dtype = switcher.get(trig_type, (-1, None))
-    if pin != -1:
-        data = np.array([pin], dtype=dtype)
-        a.write(data)  # FIXME: Uncomment when actual hardware is connected
-
-
-def save_data(fname, data_lst):
-    with open(fname, 'w', newline='') as f:
-        writer = csv.writer(f)
-        writer.writerows(data_lst)
-
-
-def return_timestr(d, conversion):
-    ms = str(d.second)
-    if conversion == 'time_only':
-        timestr = str(d).split()
-        timechar = timestr[1]
-        return_time = f"{timechar[:-2]}{ms}"
-    elif conversion == 'date_time':
-        datechar = str(d)
-        return_time = f"{datechar[:-2]}{ms}"
-    return return_time
 
 
 # displays the start of a new trial
@@ -47,14 +11,29 @@ def trialStart(win):
     core.wait(0.250)
 
 
+def draw_directions(win, side):
+    trial_start = visual.TextStim(win, text=side, color=(190, 190, 190), pos=(0, -0.5))
+    trial_start.draw(win=None)
+
+
+def draw_time(win, seconds):
+    time_txt = "Total time: " + str(round(seconds, 1)) + "s"
+    time_s = visual.TextStim(win, text=time_txt, color=(255, 255, 255), pos=(0, 0.5))
+    time_s.draw(win=None)
+
+
 #################################################################################################################
 ############################################## STIMULUS #########################################################
 #################################################################################################################
 # displays one go signal
-def actual_right_go_signal(win):
+def actual_right_go_signal(win, run, seconds):
+    if run >= 1:
+        draw_directions(win, '(J)')
+    draw_time(win, seconds)
+
     # Draw shape
-    trialStart(win)
-    go_signal_right = visual.rect.Rect(win, width=0.5, height=0.5, lineWidth=20, lineColor=(255, 255, 255), pos=(0, 0))
+    # trialStart(win)
+    go_signal_right = visual.rect.Rect(win, width=0.5, height=0.7, lineWidth=20, lineColor=(255, 255, 255), pos=(0, 0))
     go_signal_right.draw(win=None)
     go_signal_right.autoDraw = False
     visual.rect.Rect(win, width=0.022, height=0.022, lineColor=(255, 255, 255), pos=(0.25, 0.25), fillColor=True).draw(
@@ -72,10 +51,14 @@ def actual_right_go_signal(win):
 
 
 # displays the other go signal
-def actual_left_go_signal(win):
+def actual_left_go_signal(win, run, seconds):
+    if run >= 1:
+        draw_directions(win, '(F)')
+    draw_time(win, seconds)
+
     # Draw shape
-    trialStart(win)
-    go_signal_left = visual.circle.Circle(win, radius=0.25, lineWidth=20, lineColor=(255, 255, 255), fillColor=None)
+    # trialStart(win)
+    go_signal_left = visual.circle.Circle(win, radius=130, lineWidth=20, lineColor=(255, 255, 255), units="pix", fillColor=None)
     go_signal_left.draw(win=None)
     go_signal_left.autoDraw = False
     win.flip()
@@ -84,10 +67,14 @@ def actual_left_go_signal(win):
     event.waitKeys(keyList=['f'])
 
 
-def actual_right_stop_signal(win, ssd):
+def actual_right_stop_signal(win, run, ssd, seconds):
+    if run >= 1:
+        draw_directions(win, '(J)')
+    draw_time(win, seconds)
+
     # Draw shape
-    trialStart(win)
-    stop_signal_right = visual.rect.Rect(win, width=0.5, height=0.5, lineWidth=20,
+    # trialStart(win)
+    stop_signal_right = visual.rect.Rect(win, width=0.5, height=0.7, lineWidth=20,
                                          lineColor=(255, 255, 255), pos=(0, 0))
     stop_signal_right.draw(win=None)
     stop_signal_right.autoDraw = False
@@ -103,6 +90,10 @@ def actual_right_stop_signal(win, ssd):
 
     # Show stop signal
     core.wait(ssd)
+    if run >= 1:
+        draw_directions(win, '(J)')
+    draw_time(win, seconds)
+
     stop_signal_right.draw(win=None)
     stop_signal_right.autoDraw = False
     visual.rect.Rect(win, width=0.022, height=0.022, lineColor=(255, 255, 255), pos=(0.25, 0.25), fillColor=True).draw(
@@ -113,7 +104,7 @@ def actual_right_stop_signal(win, ssd):
         win=None)
     visual.rect.Rect(win, width=0.022, height=0.022, lineColor=(255, 255, 255), pos=(-0.25, -0.25),
                      fillColor=True).draw(win=None)
-    stop_circle = visual.circle.Circle(win, radius=0.03, lineColor='red', fillColor='red')
+    stop_circle = visual.circle.Circle(win, radius=15, lineColor="blue", units="pix", fillColor="blue")
     stop_circle.draw(win=None)
     stop_circle.autoDraw = False
     win.flip()
@@ -122,28 +113,36 @@ def actual_right_stop_signal(win, ssd):
     keys = event.waitKeys(maxWait=1.25, keyList=['j'])
     if keys != None:
         flag = "Fail"
-        ssd = ssd - 0.050
+        ssd = max(ssd - 0.015, 0)
     else:
         flag = "Success"
-        ssd = ssd + 0.050
+        ssd = ssd + 0.015
     return ssd, flag
 
 
 # Displays other stop signal
-def actual_left_stop_signal(win, ssd):
+def actual_left_stop_signal(win, run, ssd, seconds):
+    if run >= 1:
+        draw_directions(win, '(F)')
+    draw_time(win, seconds)
+
     # Draw shape
-    trialStart(win)
-    stop_signal_left = visual.circle.Circle(win, radius=0.25, lineWidth=20,
-                                            lineColor=(255, 255, 255), fillColor=None)
+    # trialStart(win)
+    stop_signal_left = visual.circle.Circle(win, radius=130, lineWidth=20,
+                                            lineColor=(255, 255, 255), units="pix", fillColor=None)
     stop_signal_left.draw(win=None)
     stop_signal_left.autoDraw = False
     win.flip()
 
     # Show stop signal
     core.wait(ssd)
+    if run >= 1:
+        draw_directions(win, '(F)')
+    draw_time(win, seconds)
+
     stop_signal_left.draw(win=None)
     stop_signal_left.autoDraw = False
-    stop_circle = visual.circle.Circle(win, radius=0.03, lineColor='red', fillColor='red')
+    stop_circle = visual.circle.Circle(win, radius=15, lineColor="blue", units="pix", fillColor="blue")
     stop_circle.draw(win=None)
     stop_circle.autoDraw = False
     win.flip()
@@ -152,10 +151,10 @@ def actual_left_stop_signal(win, ssd):
     keys = event.waitKeys(maxWait=1.25, keyList=['f'])
     if keys != None:
         flag = "Fail"
-        ssd = ssd - 0.050
+        ssd = max(ssd - 0.015, 0)
     else:
         flag = "Success"
-        ssd = ssd + 0.050
+        ssd = ssd + 0.015
     return ssd, flag
 
 

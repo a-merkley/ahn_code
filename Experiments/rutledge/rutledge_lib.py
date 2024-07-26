@@ -1,6 +1,5 @@
 from psychopy import visual
 import random
-import csv
 
 
 reward_amt = 5
@@ -18,12 +17,6 @@ def total_money_txt(win, total_money):
 
 def decoy_str2int(dc_str):
     return -int(dc_str[2:])
-
-
-def save_data(fname, data_lst):
-    with open(fname, 'w', newline='') as f:
-        writer = csv.writer(f)
-        writer.writerows(data_lst)
 
 
 def draw_0(win, side):

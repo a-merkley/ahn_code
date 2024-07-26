@@ -28,65 +28,32 @@ Output csv file description:
 from psychopy import visual, core, event
 import rutledge_lib as rlib
 import random
-from serial.tools import list_ports
-import serial
 import numpy as np
-
-arduino_plugin = True
-if arduino_plugin:
-    ports = list_ports.comports()
-    if not ports:
-        print("No ports available now. Please check if Arduino is plugged in.")
-    port = ports[-1].device
-    a = serial.Serial(port, 115200)
-else:
-    input("WARNING: YOU ARE RUNNING THE EXPERIMENT WITHOUT ARDUINO PLUGGED IN. PRESS ENTER TO PROCEED. ")
-    a = None
-
-
-# Trigger function
-def write_trigger(trig_type, a):
-  switcher = {
-      'start_experiment': (8, "uint8"),
-      'stim_onset': (5, "uint8"),
-      'button_press': (6, "uint8"),
-      'answer_showing': (7, "uint8")
-  }
-  pin, dtype = switcher.get(trig_type, (-1, None))
-  if pin != -1:
-    data = np.array([pin], dtype=dtype)
-    a.write(data)  # FIXME: Uncomment when actual hardware is connected
-
-
-trials = [["obs_setting", "decoy_setting", "decoy1_reward", "decoy2_reward", "obs_position", "choice", "gain", "total"]]
-
-
-# Display instructions
-win = visual.Window(fullscr=True)  #Instantiating a window space
-# win = visual.Window([600, 600])  #Instantiating a window space  # for debugging
-
-instructions = "Choose between two lotteries after the white fixation cross disappears: " \
-               "press 'F' for left and 'J' for right. You then randomly receive one of the rewards." \
-               "\n\nIf no option is chosen within 1.25 seconds, you will automatically lose $10.\nTry to maximize your reward!" \
-               "\n\nPress 'Enter' to start."
-visual.TextStim(win, text=instructions).draw()
-win.flip()
-event.waitKeys(keyList=['return'])
-
+from datetime import datetime
+import Experiments.experiment_lib as exlib  # Library is in a parent folder called "Experiments"
 
 
 ###########################################################################################################
 ###########################################################################################################
 # Parameters: patient
-patient = "p13"
+pnum = input("Enter patient number: ")
+run = int(input("Enter run number: "))
+patient = "p" + pnum
+exp_name = "rutledge"
 root_path = "C:\\Users\\amand\\Documents\\Research\\Project_AHN\\DD\\Data_processing\\data\\" + patient + "\\"
-save_name = patient + "_rutledge_behavior.csv"
+save_name = patient + "_" + exp_name + "_behavior_run" + str(run) + ".csv"
 
 # Parameters: experiment
-num_trials = 10
+total_money = 500
+original_money = 500
 delay_choice = 1.0
 delay_outcome = 2.0
-total_money = 500
+if run == 1:
+    delay_option = 5.0
+    num_trials = 10
+else:
+    delay_option = 2.5
+    num_trials = 50
 
 probabilities = {
     0: rlib.draw_0,
@@ -124,9 +91,31 @@ decoy_answer_probabilities = {
 
 decoy_options = ["+$0", "-$1", "-$2", "-$3", "-$4", "-$5", "-$10"]
 
+
+# Behavior metadata
+trials = [["obs_setting", "decoy_setting", "decoy1_reward", "decoy2_reward", "obs_position",
+           "choice", "gain", "total", "stim_time", "choice_time", "show_time"]]
+
+
+# Get Arduino port
+arduino_plugin = False
+a = exlib.return_arduino_port(arduino_plugin)
+
+
+# Display instructions
+win = visual.Window(fullscr=True)  # Instantiating a window space
+
+instructions = "Choose between two lotteries after the white fixation cross disappears: " \
+               "press 'F' for left and 'J' for right. You then randomly receive one of the rewards." \
+               "\n\nIf no option is chosen within 1.25 seconds, you will automatically lose $10.\nTry to make more than $500!" \
+               "\n\nPress 'Enter' to start."
+visual.TextStim(win, text=instructions).draw()
+win.flip()
+event.waitKeys(keyList=['return'])
+
 #########################################################################################################
 
-write_trigger('start_experiment', a)
+exlib.write_trigger('start_experiment', a, arduino_plugin, exp_name)
 
 while num_trials > 0:
     rlib.total_money_txt(win, total_money)
@@ -152,7 +141,8 @@ while num_trials > 0:
     # Save settings
     trials.append([str(i), str(x), rlib.decoy_str2int(dc1), rlib.decoy_str2int(dc2), prob_side_str])
 
-    write_trigger('stim_onset', a)
+    exlib.write_trigger('stim_onset', a, arduino_plugin, exp_name)
+    stim_time = exlib.return_timestr(datetime.now(), 'time_only')
 
     # Options
     trial_start = visual.TextStim(win, text='+', color=(255, 255, 255), height=0.5)
@@ -161,7 +151,7 @@ while num_trials > 0:
     probabilities[i](win, prob_side)
     decoy_probabilities[x](win, dc1, dc2, decoy_side)
     win.flip()
-    core.wait(2.5)
+    core.wait(delay_option)
 
     # Choice
     rlib.total_money_txt(win, total_money)
@@ -169,11 +159,14 @@ while num_trials > 0:
     decoy_probabilities[x](win, dc1, dc2, decoy_side)
     win.flip()
     keys = event.waitKeys(keyList=['f', 'j'], clearEvents=True, maxWait=1.25)
-    write_trigger('button_press', a)  # indicates end of waiting time
+
+    exlib.write_trigger('choice', a, arduino_plugin, exp_name)  # indicates end of waiting time
+    choice_time = exlib.return_timestr(datetime.now(), 'time_only')
 
     if keys == None:
-        core.wait(0.3)  # Brief pause
-        write_trigger('answer_showing', a)
+        core.wait(0.5)  # Brief pause
+        exlib.write_trigger('answer_showing', a, arduino_plugin, exp_name)
+        show_time = exlib.return_timestr(datetime.now(), 'time_only')
         trials[-1].extend(["None", "None"])
         complete_loss_message = 'Time out! You have lost $10.'
         message = visual.TextStim(win, text=complete_loss_message)
@@ -182,10 +175,9 @@ while num_trials > 0:
         total_money -= 10
         rlib.total_money_txt(win, total_money)
         win.flip()
-        core.wait(4.0)
-    elif ('f' in keys and decoy_side == 1) or ('j' in keys and decoy_side == -1):
-        # write_trigger('button_press', a)
+        core.wait(3.5)
 
+    elif ('f' in keys and decoy_side == 1) or ('j' in keys and decoy_side == -1):
         # Delay
         probabilities[i](win, prob_side)
         rlib.total_money_txt(win, total_money)
@@ -193,16 +185,16 @@ while num_trials > 0:
         core.wait(delay_choice)
 
         # Outcome
-        write_trigger('answer_showing', a)
+        exlib.write_trigger('answer_showing', a, arduino_plugin, exp_name)
+        show_time = exlib.return_timestr(datetime.now(), 'time_only')
         gain = probabilities_answer[i](win, prob_side)
         total_money += gain
         rlib.total_money_txt(win, total_money)
         win.flip()
         core.wait(delay_outcome)
         trials[-1].extend(["Observation", str(gain)])
-    elif ('j' in keys and decoy_side == 1) or ('f' in keys and decoy_side == -1):
-        # write_trigger('button_press', a)
 
+    elif ('j' in keys and decoy_side == 1) or ('f' in keys and decoy_side == -1):
         # Delay
         decoy_probabilities[x](win, dc1, dc2, decoy_side)
         rlib.total_money_txt(win, total_money)
@@ -210,7 +202,8 @@ while num_trials > 0:
         core.wait(delay_choice)
 
         # Outcome
-        write_trigger('answer_showing', a)
+        exlib.write_trigger('answer_showing', a, arduino_plugin, exp_name)
+        show_time = exlib.return_timestr(datetime.now(), 'time_only')
         gain = decoy_answer_probabilities[x](win, dc1, dc2, decoy_side)
         total_money += gain
         rlib.total_money_txt(win, total_money)
@@ -218,18 +211,24 @@ while num_trials > 0:
         core.wait(delay_outcome)
         trials[-1].extend(["Decoy", str(-gain)])
 
+    # Save the remaining variables
     trials[-1].append(str(total_money))
+    trials[-1].extend([stim_time, choice_time, show_time])
 
     num_trials = num_trials - 1
 
 
-write_trigger('end_experiment', a)
+# End experiment
+exlib.write_trigger('end_experiment', a, arduino_plugin, exp_name)
 
 # Saving the data
-rlib.save_data(save_name, trials)
+exlib.save_data(save_name, trials)
 
 # Display thank you message
-end_str = "Task complete!\n\nYou earned $" + str(total_money) + "."
+if total_money < original_money:
+    end_str = "Task complete!\n\nYou earned $" + str(total_money) + " out of $" + str(original_money) + "."
+else:
+    end_str = "Congratulations!\n\nYou earned $" + str(total_money) + " out of $" + str(original_money) + "."
 visual.TextStim(win, text=end_str).draw()
 win.flip()
 event.waitKeys()  # Wait for any keypress

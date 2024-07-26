@@ -259,10 +259,11 @@ def bart(save_filename, num_runs):
 
                 
 if __name__ == "__main__":
-    try:
-        save_filename = input("Please enter filename: ")  #Provide the filename you want to save the data to
-    except EOFError:
-        save_filename = "default_filename"  # Provide the filename you want to save the data to
-    save_filename = save_filename + ".csv"
-    num_runs = 40
-    bart(save_filename, num_runs)
+    patient = "p13"
+    run = int(input("Enter run number: "))
+    num_trials = 4
+
+    root_path = "C:\\Users\\amand\\Documents\\Research\\Project_AHN\\DD\\Data_processing\\data\\" + patient + "\\"
+    save_filename = patient + "_bart_behavior_run" + str(run) + ".csv"
+
+    bart(save_filename, num_trials)
