@@ -32,9 +32,21 @@ for i in range(num_stroop_exp):
 
     # Read in behavior csv
     experiment = "stroop" + str(i+1)
-    path_csv = csv_path + experiment + ".csv"
+    path_csv = csv_path + experiment + "_old.csv"  # AUGMENTATION CODE
     df = slib.read_csv_file(path_csv)
     num_trials = len(df)
+
+    # AUGMENTATION CODE
+    colors = df['color']
+    control_arr = []
+    for n in range(num_trials):
+        if colors[n] == 'black':
+            control_arr.append(1)
+        else:
+            control_arr.append(0)
+    df.insert(3, 'control', control_arr)
+    new_df_path = root + patient + "\\behavior\\" + patient + "_stroop" + str(i+1) + ".csv"
+    df.to_csv(new_df_path)
 
     # Compute reaction times
     stim_arr = df['stim_time'].to_numpy()
@@ -44,13 +56,14 @@ for i in range(num_stroop_exp):
     rxn = np.array([(choice_time[j] - stim_time[j]).total_seconds() for j in range(num_trials)])
     rxn_times.append(rxn)
 
-    # Filter out congruent/incongruent trials
+    # Filter out congruent/incongruent trials & controls
     congruent_flag = df['congruent'].to_numpy()
     congruent_arr.append(congruent_flag)
+    # control_flag = df['control'].to_numpy()
 
     # Compute average & median reaction times
     for c_flag in [0, 1]:
-        rxn_filt = rxn[np.where(congruent_flag == c_flag)[0]]
+        rxn_filt = rxn[np.where((congruent_flag == c_flag))[0]]# & (control_flag == 0))[0]]
         rxn_av = np.mean(rxn_filt)
         rxn_med = np.median(rxn_filt)
         print("c_flag = " + str(c_flag) + ". Average = " + str(round(rxn_av, 3)) + ". Median = " + str(rxn_med))
@@ -99,6 +112,3 @@ rxn_c_all[rxn_c_all > 4] = 0  # FIXME: do outlier detection better
 plt.hist(rxn_c_all, bins=20)
 plt.hist(rxn_ic_all, bins=20)
 plt.show()
-
-print("Hi")
-
