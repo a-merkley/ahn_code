@@ -16,7 +16,7 @@ start_time = 0  # Start measuring width from this time
 
 # Collect patient metadata
 subject = CONST.Subject(patient)
-region = subject.entorhinal
+region = subject.amygdala_l
 probes = len(region)
 dim = int(np.ceil(np.sqrt(probes)))
 
@@ -48,7 +48,7 @@ c_trials = np.mean(trials[c_idx[:-1], :, start_time:width], axis=0)
 nc_trials = np.mean(trials[nc_idx[:-1], :, start_time:width], axis=0)
 
 # Plot trials
-c_stderr = np.std(trials[c_idx, :, start_time:width], axis=0) / np.sqrt(len(c_idx))
+c_stderr = np.std(trials[c_idx[:-1], :, start_time:width], axis=0) / np.sqrt(len(c_idx))
 nc_stderr = np.std(trials[nc_idx, :, start_time:width], axis=0) / np.sqrt(len(nc_idx))
 t = np.arange(start_time, width)/1000 if alignment == "left" else np.arange(-int(width/2), int(width/2))/1000
 for i, c in enumerate(region):

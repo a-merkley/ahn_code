@@ -8,7 +8,7 @@ import seeg_constants as CONST
 
 
 # Constants for each patient and file save specification. FIXME: THE FOLLOWING ARE PARAMETERS YOU CAN CHANGE
-patient = 'p9'
+patient = 'p7'
 width = 1000  # Trials will be this long (in ms)
 event = 2  # On what even to align stroop tasks. 1: stimulus onset, 2: keypress, 3: trial start (only exists for p1, p2)
 alignment = 'center'  # Align events either 'left' or 'center'
