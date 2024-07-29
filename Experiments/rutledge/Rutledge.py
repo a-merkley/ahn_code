@@ -41,7 +41,7 @@ run = int(input("Enter run number: "))
 patient = "p" + pnum
 exp_name = "rutledge"
 root_path = "C:\\Users\\amand\\Documents\\Research\\Project_AHN\\DD\\Data_processing\\data\\" + patient + "\\"
-save_name = patient + "_" + exp_name + "_behavior_run" + str(run) + ".csv"
+save_name = patient + "_" + exp_name + str(run) + ".csv"
 
 # Parameters: experiment
 total_money = 500

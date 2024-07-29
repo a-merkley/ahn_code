@@ -12,7 +12,7 @@ run = int(input("Enter run number: "))
 patient = "p" + pnum
 exp_name = "stroop"
 root_path = "C:\\Users\\amand\\Documents\\Research\\Project_AHN\\DD\\Data_processing\\data\\" + patient + "\\"
-save_name = patient + "_" + exp_name + "_behavior_run" + str(run) + ".csv"
+save_name = patient + "_" + exp_name + str(run) + ".csv"
 
 # Parameters: experiment
 if run == 1:
@@ -25,8 +25,8 @@ percent_ctrl = 0.2
 delay_fixation = 2.0
 
 # Behavior metadata
-trials = [["word", "color", "control", "congruent", "choice", "correct",
-           "stim_time", "choice_time", "exp_start", "exp_end"]]
+trials = [["word", "color", "control", "congruent", "response", "correct",
+           "stim_time", "key_time", "start_experiment", "end_experiment"]]
 
 color_arr = ["red", "green", "blue"]
 word_arr = ["RED", "GREEN", "BLUE"]
