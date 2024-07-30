@@ -15,7 +15,7 @@ from scipy.stats import ttest_ind, f_oneway
 
 
 # Parameters
-patient = 'p8'
+patient = 'p11'
 
 root = "C:\\Users\\amand\\Documents\\Research\\Project_AHN\\Data_processing\\data\\"
 csv_path = root + patient + "\\behavior\\" + patient + "_"
@@ -33,6 +33,8 @@ ic_gratton4 = []
 ci_gratton4 = []
 cc_gratton4 = []
 
+total_outlier = 0
+
 for i in range(num_stroop_exp):
     print("\n" + patient + ", experiment " + str(i))
 
@@ -48,16 +50,20 @@ for i in range(num_stroop_exp):
     stim_time = [datetime.strptime(stim_arr[j], '%H:%M:%S.%f') for j in range(num_trials)]
     choice_time = [datetime.strptime(choice_arr[j], '%H:%M:%S.%f') for j in range(num_trials)]
     rxn = np.array([(choice_time[j] - stim_time[j]).total_seconds() for j in range(num_trials)])
+    outlier_idx = np.where(rxn > thresh)[0]
+    rxn = np.delete(rxn, outlier_idx)
     rxn_times.append(rxn)
 
     # Filter out congruent/incongruent trials & controls
-    congruent_flag = df['congruent'].to_numpy()
+    congruent_flag_raw = df['congruent'].to_numpy()
+    congruent_flag = np.delete(congruent_flag_raw, outlier_idx)
     congruent_arr.append(congruent_flag)
     control_flag = df['control'].to_numpy()
+    control_flag = np.delete(control_flag, outlier_idx)
 
     # Compute average & median reaction times
     for c_flag in [0, 1]:
-        rxn_filt = rxn[np.where((congruent_flag == c_flag) & (control_flag == 0) & (rxn < thresh))[0]]
+        rxn_filt = rxn[np.where((congruent_flag == c_flag) & (control_flag == 0))[0]]
         rxn_av = np.mean(rxn_filt)
         rxn_med = np.median(rxn_filt)
         print("c_flag = " + str(c_flag) + ". Average = " + str(round(rxn_av, 3)) + ". Median = " + str(rxn_med))
@@ -65,17 +71,21 @@ for i in range(num_stroop_exp):
 
     # Construct 2-way and 4-way gratton lists
     ii4_idx = []; ic4_idx = []; ci4_idx = []; cc4_idx = []  # 4-way lists
+    g_idx = 1
     for j in range(1, num_trials):
-        if congruent_flag[j-1] == 0:
-            if congruent_flag[j] == 0:
-                ii4_idx.append(j)
+        if j-1 in outlier_idx:
+            continue
+        if congruent_flag_raw[g_idx-1] == 0:
+            if congruent_flag_raw[g_idx] == 0:
+                ii4_idx.append(g_idx)
             else:
-                ci4_idx.append(j)
+                ci4_idx.append(g_idx)
         else:
-            if congruent_flag[j] == 0:
-                ic4_idx.append(j)
+            if congruent_flag_raw[g_idx] == 0:
+                ic4_idx.append(g_idx)
             else:
-                cc4_idx.append(j)
+                cc4_idx.append(g_idx)
+        g_idx += 1
 
     # Mean 2-way Gratton effect
     ic_idx = ii4_idx + ci4_idx
@@ -96,10 +106,13 @@ for i in range(num_stroop_exp):
     cc4_med = np.median(rxn[cc4_idx])
 
     # Save 4-way Gratton index lists (add an index shift to each experiment)
-    ii_gratton4.append(ii4_idx + np.array(len(ii4_idx)*[i*num_trials]))
-    ci_gratton4.append(ci4_idx + np.array(len(ci4_idx)*[i*num_trials]))
-    ic_gratton4.append(ic4_idx + np.array(len(ic4_idx)*[i*num_trials]))
-    cc_gratton4.append(cc4_idx + np.array(len(cc4_idx)*[i*num_trials]))
+    total_outlier += len(outlier_idx)
+    adj_num = num_trials - total_outlier
+    ii_gratton4.append(ii4_idx + np.array(len(ii4_idx)*[i*adj_num]))
+    ci_gratton4.append(ci4_idx + np.array(len(ci4_idx)*[i*adj_num]))
+    ic_gratton4.append(ic4_idx + np.array(len(ic4_idx)*[i*adj_num]))
+    cc_gratton4.append(cc4_idx + np.array(len(cc4_idx)*[i*adj_num]))
+
 
 
 # Concatenate data from all experiments
@@ -134,7 +147,6 @@ cc4_av_tot = np.mean(rxn_times[cc_gratton4])
 stats_gratton4 = f_oneway(rxn_times[ii_gratton4], rxn_times[ci_gratton4], rxn_times[ic_gratton4], rxn_times[cc_gratton4])
 
 # Plotting
-rxn_c_all[rxn_c_all > 4] = 0  # FIXME: do outlier detection better
 plt.hist(rxn_c_all, bins=20)
 plt.hist(rxn_ic_all, bins=20)
 plt.show()
