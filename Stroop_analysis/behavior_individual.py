@@ -11,13 +11,13 @@ from matplotlib import pyplot as plt
 import seeg_library as slib
 import seeg_constants as CONST
 from datetime import datetime
-from scipy.stats import ttest_ind, f_oneway
+from scipy.stats import ttest_ind, f_oneway, zscore
 
 
 # Parameters
 patient = 'p11'
-
 root = "C:\\Users\\amand\\Documents\\Research\\Project_AHN\\Data_processing\\data\\"
+
 csv_path = root + patient + "\\behavior\\" + patient + "_"
 
 subject = CONST.Subject(patient)
@@ -129,6 +129,8 @@ rxn_ic_all = rxn_times[np.where(congruent_arr == 0)[0]]
 rxn_c_av = np.mean(rxn_c_all)
 rxn_ic_av = np.mean(rxn_ic_all)
 stats_rxn = ttest_ind(rxn_c_all, rxn_ic_all)
+z_rxn = zscore(rxn_c_all)
+z_rxni = zscore(rxn_ic_all)
 
 # 2-way Gratton overall
 ic_gratton2 = np.concatenate((ii_gratton4, ci_gratton4))
@@ -147,6 +149,6 @@ cc4_av_tot = np.mean(rxn_times[cc_gratton4])
 stats_gratton4 = f_oneway(rxn_times[ii_gratton4], rxn_times[ci_gratton4], rxn_times[ic_gratton4], rxn_times[cc_gratton4])
 
 # Plotting
-plt.hist(rxn_c_all, bins=20)
-plt.hist(rxn_ic_all, bins=20)
+plt.hist(rxn_c_all, bins=20, histtype="step")
+plt.hist(rxn_ic_all, bins=20, histtype="step")
 plt.show()
